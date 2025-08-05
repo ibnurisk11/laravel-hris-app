@@ -2,7 +2,7 @@
 
 @section('content')
     <h2 class="mt-4">Salaries</h2>
-    <a href="{{ route('salaries.create') }}" class="btn btn-primary mb-3">Add New Salary</a>
+    <a href="{{ route('admin.salaries.create') }}" class="btn btn-primary mb-3">Add New Salary</a>
 
     @if (session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>
@@ -34,9 +34,9 @@
                     <td>{{ $salary->pay_date }}</td>
                     <td>{{ $salary->status }}</td>
                     <td>
-                        <a href="{{ route('salaries.show', $salary) }}" class="btn btn-info btn-sm">View</a>
-                        <a href="{{ route('salaries.edit', $salary) }}" class="btn btn-warning btn-sm">Edit</a>
-                        <form action="{{ route('salaries.destroy', $salary) }}" method="POST" style="display:inline;">
+                        <a href="{{ route('admin.salaries.show', $salary) }}" class="btn btn-info btn-sm">View</a>
+                        <a href="{{ route('admin.salaries.edit', $salary) }}" class="btn btn-warning btn-sm">Edit</a>
+                        <form action="{{ route('admin.salaries.destroy', $salary) }}" method="POST" style="display:inline;">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')">Delete</button>

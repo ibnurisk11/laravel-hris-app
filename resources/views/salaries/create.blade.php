@@ -2,7 +2,7 @@
 
 @section('content')
     <h2 class="mt-4">Add New Salary Record</h2>
-    <form action="{{ route('salaries.store') }}" method="POST">
+    <form action="{{ route('admin.salaries.store') }}" method="POST">
         @csrf
         <div class="row">
             <div class="col-md-6 mb-3">

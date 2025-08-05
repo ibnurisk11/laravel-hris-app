@@ -32,7 +32,7 @@
             overflow-y: auto;
             z-index: 1030;
             transition: transform 0.3s ease-in-out;
-            transform: translateX(-100%);
+            transform: translateX(0); /* Tampilkan sidebar secara default */
         }
         .sidebar.collapsed {
             transform: translateX(-100%);
@@ -54,21 +54,22 @@
             font-weight: bold;
         }
         .main-content {
-            margin-left: 0;
+            margin-left: var(--sidebar-width); /* Beri margin default */
             transition: margin-left .3s ease-in-out;
             padding: 20px;
         }
-        @media (min-width: 768px) {
+        .main-content.expanded {
+            margin-left: 0;
+        }
+        @media (max-width: 767.98px) {
             .sidebar {
-                transform: translateX(0);
-                width: var(--sidebar-width);
-            }
-            .sidebar.collapsed {
-                width: 0;
                 transform: translateX(-100%);
             }
+            .sidebar.show {
+                transform: translateX(0);
+            }
             .main-content {
-                margin-left: var(--sidebar-width);
+                margin-left: 0;
             }
             .main-content.expanded {
                 margin-left: 0;
@@ -114,7 +115,7 @@
     <div class="container-fluid">
         <div class="row">
             @auth
-            <nav id="sidebarMenu" class="col-md-3 col-lg-2 sidebar">
+            <nav id="sidebarMenu" class="col-md-3 col-lg-2 sidebar show">
                 <div class="position-sticky pt-3">
                     <ul class="nav flex-column">
                         <li class="nav-item">
@@ -122,31 +123,38 @@
                                 <i class="bi bi-house-door"></i> Dashboard
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('user.absen') ? 'active' : '' }}" href="{{ route('user.absen') }}">
-                                <i class="bi bi-calendar-check"></i> Absen
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('admin.divisions.index') ? 'active' : '' }}" href="{{ route('admin.divisions.index') }}">
-                                <i class="bi bi-grid-fill"></i> Divisions
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('admin.users.index') ? 'active' : '' }}" href="{{ route('admin.users.index') }}">
-                                <i class="bi bi-people"></i> Users
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('admin.attendances.index') ? 'active' : '' }}" href="{{ route('admin.attendances.index') }}">
-                                <i class="bi bi-person-check"></i> Attendances
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('admin.salaries.index') ? 'active' : '' }}" href="{{ route('admin.salaries.index') }}">
-                                <i class="bi bi-currency-dollar"></i> Salaries
-                            </a>
-                        </li>
+                        {{-- Menu untuk Admin --}}
+                        @if (auth()->user()->role === 'admin')
+                            <li class="nav-item">
+                                <a class="nav-link {{ request()->routeIs('admin.divisions.index') ? 'active' : '' }}" href="{{ route('admin.divisions.index') }}">
+                                    <i class="bi bi-grid-fill"></i> Divisions
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {{ request()->routeIs('admin.users.index') ? 'active' : '' }}" href="{{ route('admin.users.index') }}">
+                                    <i class="bi bi-people"></i> Users
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {{ request()->routeIs('admin.attendances.index') ? 'active' : '' }}" href="{{ route('admin.attendances.index') }}">
+                                    <i class="bi bi-person-check"></i> Attendances
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {{ request()->routeIs('admin.salaries.index') ? 'active' : '' }}" href="{{ route('admin.salaries.index') }}">
+                                    <i class="bi bi-currency-dollar"></i> Salaries
+                                </a>
+                            </li>
+                        @endif
+
+                        {{-- Menu untuk User Biasa --}}
+                        @if (auth()->user()->role === 'user')
+                            <li class="nav-item">
+                                <a class="nav-link {{ request()->routeIs('user.absen') ? 'active' : '' }}" href="{{ route('user.absen') }}">
+                                    <i class="bi bi-calendar-check"></i> Absen
+                                </a>
+                            </li>
+                        @endif
                     </ul>
                 </div>
             </nav>
@@ -155,24 +163,49 @@
             </main>
             @else
             <main class="container">
-                 @yield('content')
+                    @yield('content')
             </main>
             @endauth
         </div>
     </div>
     
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" xintegrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const sidebar = document.getElementById('sidebarMenu');
             const mainContent = document.querySelector('.main-content');
             const sidebarToggle = document.getElementById('sidebarToggle');
+            const isDesktop = window.matchMedia('(min-width: 768px)').matches;
             
+            if (isDesktop && sidebar) {
+                sidebar.classList.remove('collapsed');
+                sidebar.classList.add('show');
+                mainContent.classList.remove('expanded');
+            } else if (sidebar) {
+                sidebar.classList.remove('show');
+                sidebar.classList.add('collapsed');
+                mainContent.classList.add('expanded');
+            }
+
             if (sidebarToggle) {
                 sidebarToggle.addEventListener('click', function() {
                     sidebar.classList.toggle('collapsed');
                     mainContent.classList.toggle('expanded');
+                    sidebar.classList.toggle('show');
                 });
             }
+
+            // Atur ulang sidebar saat window diubah ukurannya
+            window.addEventListener('resize', function() {
+                const isDesktop = window.matchMedia('(min-width: 768px)').matches;
+                if (isDesktop) {
+                    sidebar.classList.remove('collapsed');
+                    mainContent.classList.remove('expanded');
+                } else {
+                    sidebar.classList.add('collapsed');
+                    mainContent.classList.add('expanded');
+                }
+            });
         });
     </script>
 </body>

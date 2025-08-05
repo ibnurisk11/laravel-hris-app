@@ -2,7 +2,7 @@
 
 @section('content')
     <h2 class="mt-4">Edit Salary Record</h2>
-    <form action="{{ route('salaries.update', $salary) }}" method="POST">
+    <form action="{{ route('admin.salaries.update', $salary) }}" method="POST">
         @csrf
         @method('PUT')
         <div class="row">

@@ -20,7 +20,11 @@ use App\Http\Controllers\DashboardController;
 |
 */
 
-// Rute Halaman Publik & Autentikasi
+// Rute untuk halaman welcome
+Route::get('/', function () {
+    return view('welcome');
+});
+
 // Rute untuk halaman login dan logout
 Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
 Route::post('/login', [AuthenticatedSessionController::class, 'store']);
@@ -57,4 +61,3 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     // Pengelolaan Gaji
     Route::resource('salaries', SalaryController::class);
 });
-

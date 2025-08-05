@@ -14,6 +14,8 @@
     </div>
 </div>
 
+{{-- Kartu statistik hanya ditampilkan untuk admin --}}
+@if (auth()->user()->role === 'admin')
 <div class="row">
     <div class="col-md-4">
         <div class="card text-white bg-primary mb-3">
@@ -43,6 +45,7 @@
         </div>
     </div>
 </div>
+@endif
 
 <div class="card mt-4">
     <div class="card-header">
