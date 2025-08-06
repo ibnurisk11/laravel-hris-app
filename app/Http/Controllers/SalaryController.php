@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Salary;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controller; // Pastikan ini ada
+use Carbon\Carbon; // Tambahkan ini untuk mengelola tanggal/waktu
 
 class SalaryController extends Controller
 {
@@ -14,7 +16,7 @@ class SalaryController extends Controller
     public function index()
     {
         $salaries = Salary::with('user')->paginate(10);
-        return view('salaries.index', compact('salaries'));
+        return view('admin.salaries.index', compact('salaries')); // Sesuaikan path view jika perlu
     }
 
     /**
@@ -22,8 +24,13 @@ class SalaryController extends Controller
      */
     public function create()
     {
-        $users = User::all();
-        return view('salaries.create', compact('users'));
+        $users = User::all(); // Titik koma ditambahkan
+        $months = [ // Daftar bulan untuk dropdown
+            'January' => 1, 'February' => 2, 'March' => 3, 'April' => 4,
+            'May' => 5, 'June' => 6, 'July' => 7, 'August' => 8,
+            'September' => 9, 'October' => 10, 'November' => 11, 'December' => 12
+        ];
+        return view('admin.salaries.create', compact('users', 'months'));
     }
 
     /**
@@ -31,9 +38,9 @@ class SalaryController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
+        $validatedData = $request->validate([
             'user_id' => 'required|exists:users,id',
-            'month' => 'required|string',
+            'month' => 'required|string', // Tetap string karena dari form input
             'year' => 'required|integer',
             'basic_salary' => 'required|numeric|min:0',
             'employer_pays_fee' => 'required|numeric|min:0',
@@ -46,7 +53,10 @@ class SalaryController extends Controller
             'receivable_employee' => 'required|numeric|min:0',
         ]);
 
-        Salary::create($request->all());
+        // Konversi nama bulan (string) menjadi angka bulan (integer)
+        $validatedData['month'] = Carbon::parse($validatedData['month'])->month;
+
+        Salary::create($validatedData); // Gunakan $validatedData setelah konversi
 
         return redirect()->route('admin.salaries.index')
                          ->with('success', 'Salary record created successfully.');
@@ -57,7 +67,7 @@ class SalaryController extends Controller
      */
     public function show(Salary $salary)
     {
-        return view('salaries.show', compact('salary'));
+        return view('admin.salaries.show', compact('salary')); // Sesuaikan path view jika perlu
     }
 
     /**
@@ -66,7 +76,12 @@ class SalaryController extends Controller
     public function edit(Salary $salary)
     {
         $users = User::all();
-        return view('salaries.edit', compact('salary', 'users'));
+        $months = [ // Daftar bulan untuk dropdown
+            'January' => 1, 'February' => 2, 'March' => 3, 'April' => 4,
+            'May' => 5, 'June' => 6, 'July' => 7, 'August' => 8,
+            'September' => 9, 'October' => 10, 'November' => 11, 'December' => 12
+        ];
+        return view('admin.salaries.edit', compact('salary', 'users', 'months'));
     }
 
     /**
@@ -74,9 +89,9 @@ class SalaryController extends Controller
      */
     public function update(Request $request, Salary $salary)
     {
-        $request->validate([
+        $validatedData = $request->validate([
             'user_id' => 'required|exists:users,id',
-            'month' => 'required|string',
+            'month' => 'required|string', // Tetap string karena dari form input
             'year' => 'required|integer',
             'basic_salary' => 'required|numeric|min:0',
             'employer_pays_fee' => 'required|numeric|min:0',
@@ -89,7 +104,10 @@ class SalaryController extends Controller
             'receivable_employee' => 'required|numeric|min:0',
         ]);
 
-        $salary->update($request->all());
+        // Konversi nama bulan (string) menjadi angka bulan (integer)
+        $validatedData['month'] = Carbon::parse($validatedData['month'])->month;
+
+        $salary->update($validatedData); // Gunakan $validatedData setelah konversi
 
         return redirect()->route('admin.salaries.index')
                          ->with('success', 'Salary record updated successfully.');
