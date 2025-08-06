@@ -33,6 +33,8 @@
             <label for="type" class="form-label">Type</label>
             <select class="form-control" id="type" name="type">
                 <option value="present" @selected(old('type', $attendance->type) == 'present')>Present</option>
+                <option value="wfo" @selected(old('type', $attendance->type) == 'wfo')>WFO</option>
+                <option value="wfh" @selected(old('type', $attendance->type) == 'wfh')>WFH</option>
                 <option value="leave" @selected(old('type', $attendance->type) == 'leave')>Leave</option>
                 <option value="sick" @selected(old('type', $attendance->type) == 'sick')>Sick</option>
             </select>
